@@ -13,15 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+$usingSanctum = true;
+$authMiddleware = $usingSanctum ? 'auth:sanctum' : 'auth';
+$guestMiddleware = $usingSanctum ? 'guest:sanctum' : 'guest';
+
 Route::get('/', function() {
 	return \Inertia\Inertia::render('Home');
 });
 
-Route::middleware('guest:sanctum')->get('/login', function() {
+Route::middleware($guestMiddleware)->get('/login', function() {
 	return \Inertia\Inertia::render('Login');
 });
 
-Route::middleware('guest:sanctum')->post('/login', function(\Illuminate\Http\Request $request) {
+Route::middleware($guestMiddleware)->post('/login', function(\Illuminate\Http\Request $request) {
 	if (auth()->attempt($request->only('email', 'password'))) {
 		return redirect('/account');
 	}
@@ -31,11 +35,11 @@ Route::middleware('guest:sanctum')->post('/login', function(\Illuminate\Http\Req
 	]);
 });
 
-Route::middleware('auth:sanctum')->get('/account', function() {
+Route::middleware($authMiddleware)->get('/account', function() {
 	return \Inertia\Inertia::render('Account');
 });
 
-Route::middleware('auth:sanctum')->get('/logout', function(\Illuminate\Http\Request $request) {
+Route::middleware($authMiddleware)->get('/logout', function(\Illuminate\Http\Request $request) {
 	auth()->guard('web')->logout();
 
 	if ($request->hasSession()) {
